@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import MarkdownEditor from '@/components/MarkdownEditor';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { FileText, Github, Download } from 'lucide-react';
+import { FileText, Download, Keyboard } from 'lucide-react';
+import ShortcutsDialog from '@/components/ShortcutsDialog';
 
 const defaultContent = `# Welcome to the Markdown Editor
 
@@ -77,6 +78,7 @@ Start writing your own content now by editing this text!
 const Index = () => {
   const [markdown, setMarkdown] = useState(defaultContent);
   const [isAnimating, setIsAnimating] = useState(true);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -86,6 +88,22 @@ const Index = () => {
     }, 1000);
 
     return () => clearTimeout(timer);
+  }, []);
+
+  // Add keyboard shortcut for opening shortcuts dialog
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Open shortcuts with ? or F1
+      if (e.key === '?' || e.key === 'F1') {
+        e.preventDefault();
+        setIsShortcutsOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const handleExport = () => {
@@ -124,15 +142,15 @@ const Index = () => {
             <Download size={16} className="mr-1" />
             Download
           </Button>
-          <a 
-            href="https://github.com/markdown/markdown" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors ml-2"
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsShortcutsOpen(true)}
+            className="button-hover focus-ring"
           >
-            <Github size={16} />
-            <span className="hidden sm:inline">GitHub</span>
-          </a>
+            <Keyboard size={16} className="mr-1" />
+            <span className="hidden sm:inline">Shortcuts</span>
+          </Button>
         </div>
       </header>
       
@@ -148,6 +166,8 @@ const Index = () => {
       <footer className={`text-center p-4 text-sm text-muted-foreground transition-all duration-500 ${isAnimating ? 'animate-slide-in opacity-0' : 'opacity-100'}`} style={{ animationDelay: '200ms' }}>
         <p>Elegant Markdown Editor • Designed with simplicity in mind</p>
       </footer>
+
+      <ShortcutsDialog open={isShortcutsOpen} onOpenChange={setIsShortcutsOpen} />
     </div>
   );
 };
