@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import EditorToolbar from './EditorToolbar';
@@ -19,6 +18,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   onChange,
 }) => {
   const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState('');
   
   const {
     markdownText,
@@ -142,6 +142,11 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     };
   }, [handleToolbarAction, textareaRef]);
 
+  // Handler for when preview HTML changes
+  const handlePreviewHtmlChange = (html: string) => {
+    setPreviewHtml(html);
+  };
+
   return (
     <div 
       className={cn(
@@ -169,6 +174,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
           markdownText={markdownText}
           isPreviewMode={isPreviewMode}
           onContentChange={handlePreviewChange}
+          onHtmlChange={handlePreviewHtmlChange}
         />
       </div>
 
@@ -177,6 +183,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         open={isDownloadDialogOpen} 
         onOpenChange={setIsDownloadDialogOpen} 
         markdownContent={markdownText}
+        previewHtml={previewHtml}
       />
 
       {/* Hidden file input for import functionality */}

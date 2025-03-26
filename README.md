@@ -1,69 +1,103 @@
-# Welcome to your Lovable project
+# Markdown Editor
 
-## Project info
+A sleek, minimal Markdown editor built with React, TypeScript, and Tailwind CSS. This editor provides a distraction-free writing environment with live preview functionality.
 
-**URL**: https://lovable.dev/projects/47d5fe25-2de3-45f5-a33b-5ded69b9c660
+## Features
 
-## How can I edit this code?
+- **Clean & Minimalist Interface**: Focus on your content with a distraction-free writing experience
+- **Live Preview**: See your formatted Markdown as you type
+- **Code Syntax Highlighting**: Beautiful syntax highlighting for code blocks
+- **Keyboard Shortcuts**: Boost productivity with extensive keyboard shortcuts
+- **Export & Download**: Save your work as Markdown files
+- **Responsive Design**: Works perfectly on all devices
+- **Dark Mode Support**: Easy on the eyes in any lighting condition
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
+- Shadcn UI Components
+- Marked (for Markdown parsing)
+- Highlight.js (for code syntax highlighting)
+- TanStack Query
+- React Router DOM
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/47d5fe25-2de3-45f5-a33b-5ded69b9c660) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js (v16 or newer)
+- npm or yarn or bun
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Installation
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/markdown-editor.git
+cd markdown-editor
 ```
 
-**Edit a file directly in GitHub**
+2. Install dependencies
+```bash
+npm install
+# or
+yarn install
+# or
+bun install
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+3. Start the development server
+```bash
+npm run dev
+# or
+yarn dev
+# or
+bun dev
+```
 
-**Use GitHub Codespaces**
+4. Open your browser and navigate to `http://localhost:5173`
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Keyboard Shortcuts
 
-## What technologies are used for this project?
+| Shortcut | Action |
+|----------|--------|
+| Ctrl/⌘ + B | Bold text |
+| Ctrl/⌘ + I | Italic text |
+| Ctrl/⌘ + K | Add link |
+| Ctrl/⌘ + Q | Blockquote |
+| Ctrl/⌘ + E | Inline code |
+| Ctrl/⌘ + U | Unordered list |
+| Ctrl/⌘ + O | Ordered list |
+| Ctrl/⌘ + Shift + C | Code block |
+| Ctrl/⌘ + Alt + I | Image |
+| Ctrl/⌘ + 1-6 | Headings (H1-H6) |
+| Ctrl/⌘ + P | Toggle preview mode |
+| Ctrl/⌘ + S | Save/download content |
+| F11 | Toggle fullscreen |
+| ? or F1 | Open shortcuts dialog |
 
-This project is built with .
+## Building for Production
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+To build the app for production:
 
-## How can I deploy this project?
+```bash
+npm run build
+# or
+yarn build
+# or
+bun build
+```
 
-Simply open [Lovable](https://lovable.dev/projects/47d5fe25-2de3-45f5-a33b-5ded69b9c660) and click on Share -> Publish.
+The build output will be in the `dist` directory.
 
-## I want to use a custom domain - is that possible?
+## License
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+[MIT](https://choosealicense.com/licenses/mit/)
+
+## Acknowledgments
+
+- Shadcn UI for the beautiful component library
+- Marked for the powerful Markdown parsing
+- Highlight.js for code syntax highlighting

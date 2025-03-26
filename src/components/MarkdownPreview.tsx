@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useMarkdownParser } from '@/hooks/useMarkdownParser';
@@ -8,13 +7,15 @@ interface MarkdownPreviewProps {
   className?: string;
   isPreviewMode: boolean;
   onContentChange: (content: string) => void;
+  onHtmlChange?: (html: string) => void;
 }
 
 const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ 
   markdownText, 
   className,
   isPreviewMode,
-  onContentChange
+  onContentChange,
+  onHtmlChange
 }) => {
   const { htmlOutput } = useMarkdownParser(markdownText);
   const previewRef = useRef<HTMLDivElement>(null);
@@ -25,6 +26,13 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
     // Make the preview editable in preview mode
     previewRef.current.contentEditable = isPreviewMode ? 'true' : 'false';
   }, [isPreviewMode]);
+
+  // Notify parent component when HTML output changes
+  useEffect(() => {
+    if (onHtmlChange) {
+      onHtmlChange(htmlOutput);
+    }
+  }, [htmlOutput, onHtmlChange]);
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
     if (isPreviewMode && previewRef.current) {

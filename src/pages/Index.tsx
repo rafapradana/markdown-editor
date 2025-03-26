@@ -1,10 +1,12 @@
-
 import { useEffect, useState } from 'react';
 import MarkdownEditor from '@/components/MarkdownEditor';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { FileText, Download, Keyboard } from 'lucide-react';
 import ShortcutsDialog from '@/components/ShortcutsDialog';
+import DownloadDialog from '@/components/DownloadDialog';
+import { useMarkdownParser } from '@/hooks/useMarkdownParser';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const defaultContent = `# Welcome to the Markdown Editor
 
@@ -79,7 +81,9 @@ const Index = () => {
   const [markdown, setMarkdown] = useState(defaultContent);
   const [isAnimating, setIsAnimating] = useState(true);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false);
   const { toast } = useToast();
+  const { htmlOutput } = useMarkdownParser(markdown);
 
   useEffect(() => {
     // Reset animation after initial load
@@ -107,21 +111,7 @@ const Index = () => {
   }, []);
 
   const handleExport = () => {
-    const blob = new Blob([markdown], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'document.md';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    toast({
-      title: "Download successful",
-      description: "Your markdown file has been downloaded.",
-      duration: 2000,
-    });
+    setIsDownloadDialogOpen(true);
   };
 
   return (
@@ -133,6 +123,7 @@ const Index = () => {
         </div>
         
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <Button 
             variant="default" 
             size="sm" 
@@ -168,6 +159,14 @@ const Index = () => {
       </footer>
 
       <ShortcutsDialog open={isShortcutsOpen} onOpenChange={setIsShortcutsOpen} />
+      
+      {/* Download dialog */}
+      <DownloadDialog 
+        open={isDownloadDialogOpen} 
+        onOpenChange={setIsDownloadDialogOpen} 
+        markdownContent={markdown}
+        previewHtml={htmlOutput}
+      />
     </div>
   );
 };

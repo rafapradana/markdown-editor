@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
@@ -40,35 +39,163 @@
   }
 
   .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --editor-background: 224 71.4% 6%;
-    --editor-foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 210 100% 50%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
+    --background: 0 0% 10%;
+    --foreground: 0 0% 94%;
+    --editor-background: 0 0% 13%;
+    --editor-foreground: 0 0% 94%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 94%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 94%;
+    --primary: 210 90% 55%;
+    --primary-foreground: 0 0% 94%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 94%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 0% 18%;
+    --accent-foreground: 0 0% 94%;
     --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 94%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 0% 80%;
+    --sidebar-background: 0 0% 12%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 210 90% 55%;
+    --sidebar-primary-foreground: 0 0% 94%;
+    --sidebar-accent: 0 0% 18%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 210 90% 55%;
+  }
+
+  .cool {
+    --background: 210 30% 98%;
+    --foreground: 210 50% 10%;
+    --editor-background: 210 30% 95%;
+    --editor-foreground: 210 50% 10%;
+    --card: 210 30% 98%;
+    --card-foreground: 210 50% 10%;
+    --popover: 210 30% 98%;
+    --popover-foreground: 210 50% 10%;
+    --primary: 210 80% 45%;
+    --primary-foreground: 210 30% 98%;
+    --secondary: 210 20% 90%;
+    --secondary-foreground: 210 50% 20%;
+    --muted: 210 20% 90%;
+    --muted-foreground: 210 30% 40%;
+    --accent: 210 20% 90%;
+    --accent-foreground: 210 50% 20%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 216 12.2% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 210 15% 85%;
+    --input: 210 15% 85%;
+    --ring: 210 80% 40%;
+    --sidebar-background: 210 30% 95%;
+    --sidebar-foreground: 210 50% 20%;
+    --sidebar-primary: 210 80% 45%;
+    --sidebar-primary-foreground: 210 30% 98%;
+    --sidebar-accent: 210 20% 90%;
+    --sidebar-accent-foreground: 210 50% 20%;
+    --sidebar-border: 210 15% 85%;
+    --sidebar-ring: 210 80% 40%;
+  }
+
+  .warm {
+    --background: 30 25% 98%;
+    --foreground: 25 40% 15%;
+    --editor-background: 30 25% 95%;
+    --editor-foreground: 25 40% 15%;
+    --card: 30 25% 98%;
+    --card-foreground: 25 40% 15%;
+    --popover: 30 25% 98%;
+    --popover-foreground: 25 40% 15%;
+    --primary: 25 70% 45%;
+    --primary-foreground: 30 25% 98%;
+    --secondary: 30 20% 92%;
+    --secondary-foreground: 25 40% 20%;
+    --muted: 30 20% 90%;
+    --muted-foreground: 25 30% 45%;
+    --accent: 30 20% 92%;
+    --accent-foreground: 25 40% 20%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 30 25% 98%;
+    --border: 25 15% 85%;
+    --input: 25 15% 85%;
+    --ring: 25 70% 45%;
+    --sidebar-background: 30 25% 95%;
+    --sidebar-foreground: 25 40% 20%;
+    --sidebar-primary: 25 70% 45%;
+    --sidebar-primary-foreground: 30 25% 98%;
+    --sidebar-accent: 30 20% 90%;
+    --sidebar-accent-foreground: 25 40% 20%;
+    --sidebar-border: 25 15% 85%;
+    --sidebar-ring: 25 70% 45%;
+  }
+
+  .zen-garden {
+    --background: 150 30% 98%;
+    --foreground: 160 40% 15%;
+    --editor-background: 150 25% 95%;
+    --editor-foreground: 160 40% 15%;
+    --card: 150 30% 98%;
+    --card-foreground: 160 40% 15%;
+    --popover: 150 30% 98%;
+    --popover-foreground: 160 40% 15%;
+    --primary: 135 60% 40%;
+    --primary-foreground: 150 30% 98%;
+    --secondary: 150 20% 92%;
+    --secondary-foreground: 160 40% 20%;
+    --muted: 150 20% 90%;
+    --muted-foreground: 160 30% 40%;
+    --accent: 150 20% 92%;
+    --accent-foreground: 160 40% 20%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 150 30% 98%;
+    --border: 150 15% 85%;
+    --input: 150 15% 85%;
+    --ring: 135 60% 40%;
+    --sidebar-background: 150 25% 95%;
+    --sidebar-foreground: 160 40% 20%;
+    --sidebar-primary: 135 60% 40%;
+    --sidebar-primary-foreground: 150 30% 98%;
+    --sidebar-accent: 150 20% 90%;
+    --sidebar-accent-foreground: 160 40% 20%;
+    --sidebar-border: 150 15% 85%;
+    --sidebar-ring: 135 60% 40%;
+  }
+
+  .sakura-dawn {
+    --background: 335 30% 98%;
+    --foreground: 340 40% 20%;
+    --editor-background: 335 25% 95%;
+    --editor-foreground: 340 40% 20%;
+    --card: 335 30% 98%;
+    --card-foreground: 340 40% 20%;
+    --popover: 335 30% 98%;
+    --popover-foreground: 340 40% 20%;
+    --primary: 340 70% 60%;
+    --primary-foreground: 335 30% 98%;
+    --secondary: 335 20% 92%;
+    --secondary-foreground: 340 40% 25%;
+    --muted: 335 20% 90%;
+    --muted-foreground: 340 30% 45%;
+    --accent: 335 20% 92%;
+    --accent-foreground: 340 40% 25%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 335 30% 98%;
+    --border: 335 15% 85%;
+    --input: 335 15% 85%;
+    --ring: 340 70% 60%;
+    --sidebar-background: 335 25% 95%;
+    --sidebar-foreground: 340 40% 25%;
+    --sidebar-primary: 340 70% 60%;
+    --sidebar-primary-foreground: 335 30% 98%;
+    --sidebar-accent: 335 20% 90%;
+    --sidebar-accent-foreground: 340 40% 25%;
+    --sidebar-border: 335 15% 85%;
+    --sidebar-ring: 340 70% 60%;
   }
 }
 
@@ -187,11 +314,51 @@
 
 /* Glass morphism effects */
 .glass {
-  @apply bg-white/80 dark:bg-black/30 backdrop-blur-lg border border-white/20 dark:border-white/10;
+  @apply bg-white/80 backdrop-blur-lg border border-white/20;
+}
+
+.dark .glass {
+  @apply bg-black/20 backdrop-blur-lg border border-white/5;
+}
+
+.cool .glass {
+  @apply bg-blue-50/60 backdrop-blur-lg border border-blue-100/30;
+}
+
+.warm .glass {
+  @apply bg-orange-50/60 backdrop-blur-lg border border-orange-100/30;
+}
+
+.zen-garden .glass {
+  @apply bg-green-50/60 backdrop-blur-lg border border-green-100/30;
+}
+
+.sakura-dawn .glass {
+  @apply bg-pink-50/60 backdrop-blur-lg border border-pink-100/30;
 }
 
 .glass-hover {
-  @apply hover:bg-white/90 dark:hover:bg-black/40 transition-all duration-300;
+  @apply hover:bg-white/90 transition-all duration-300;
+}
+
+.dark .glass-hover {
+  @apply hover:bg-black/30 transition-all duration-300;
+}
+
+.cool .glass-hover {
+  @apply hover:bg-blue-50/70 transition-all duration-300;
+}
+
+.warm .glass-hover {
+  @apply hover:bg-orange-50/70 transition-all duration-300;
+}
+
+.zen-garden .glass-hover {
+  @apply hover:bg-green-50/70 transition-all duration-300;
+}
+
+.sakura-dawn .glass-hover {
+  @apply hover:bg-pink-50/70 transition-all duration-300;
 }
 
 /* Button hover animations */
@@ -202,4 +369,163 @@
 /* Fancy focus states */
 .focus-ring {
   @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+}
+
+/* PDF Export Styles */
+.pdf-export {
+  max-width: 210mm; /* A4 width */
+  margin: 0 auto;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.pdf-export h1 {
+  font-size: 28px;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #111827;
+}
+
+.pdf-export h2 {
+  font-size: 24px;
+  margin-top: 20px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #111827;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.3em;
+}
+
+.pdf-export h3 {
+  font-size: 20px;
+  margin-top: 16px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #111827;
+}
+
+.pdf-export p {
+  margin-top: 0;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.pdf-export code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  white-space: break-spaces;
+  background-color: rgba(175, 184, 193, 0.2);
+  border-radius: 6px;
+  color: #24292f;
+}
+
+.pdf-export pre {
+  margin-top: 0;
+  margin-bottom: 16px;
+  padding: 16px;
+  overflow: auto;
+  background-color: #f6f8fa;
+  border-radius: 6px;
+}
+
+.pdf-export pre code {
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+.pdf-export ul, 
+.pdf-export ol {
+  margin-top: 0;
+  margin-bottom: 16px;
+  padding-left: 2em;
+}
+
+.pdf-export img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.pdf-export blockquote {
+  padding: 0 1em;
+  color: #57606a;
+  border-left: 0.25em solid #d0d7de;
+  margin: 0 0 16px 0;
+}
+
+.pdf-export table {
+  display: block;
+  width: 100%;
+  overflow: auto;
+  margin-top: 0;
+  margin-bottom: 16px;
+  border-collapse: collapse;
+}
+
+.pdf-export table th,
+.pdf-export table td {
+  padding: 6px 13px;
+  border: 1px solid #d0d7de;
+}
+
+.pdf-export table tr {
+  background-color: #ffffff;
+  border-top: 1px solid #d0d7de;
+}
+
+.pdf-export table tr:nth-child(2n) {
+  background-color: #f6f8fa;
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+  .pdf-export h1,
+  .pdf-export h2,
+  .pdf-export h3,
+  .pdf-export h4,
+  .pdf-export h5,
+  .pdf-export h6 {
+    color: #f3f4f6;
+  }
+  
+  .pdf-export {
+    color: #e5e7eb;
+    background-color: #111827;
+  }
+  
+  .pdf-export code {
+    background-color: rgba(240, 246, 252, 0.15);
+    color: #e5e7eb;
+  }
+  
+  .pdf-export pre {
+    background-color: #1e293b;
+  }
+  
+  .pdf-export blockquote {
+    color: #9ca3af;
+    border-left-color: #374151;
+  }
+  
+  .pdf-export table tr {
+    background-color: #111827;
+    border-top-color: #374151;
+  }
+  
+  .pdf-export table tr:nth-child(2n) {
+    background-color: #1f2937;
+  }
+  
+  .pdf-export table th,
+  .pdf-export table td {
+    border-color: #374151;
+  }
 }

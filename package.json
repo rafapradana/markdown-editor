@@ -46,6 +46,7 @@
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.3.0",
     "highlight.js": "^11.9.0",
+    "html-to-pdf-js": "^0.9.3",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.462.0",
     "marked": "^11.1.1",
