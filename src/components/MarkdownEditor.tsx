@@ -7,9 +7,8 @@ import { cn } from '@/lib/utils';
 import EditorToolbar from './EditorToolbar';
 import { useToast } from "@/components/ui/use-toast";
 
-// Configure marked with highlight.js for code syntax highlighting
+// Configure marked options
 marked.setOptions({
-  langPrefix: 'hljs language-', // highlight.js css expects a language-* prefix
   gfm: true,
   breaks: true,
 });
@@ -17,6 +16,7 @@ marked.setOptions({
 // Custom renderer for code highlighting
 const renderer = {
   code(code: string, language: string) {
+    // Use the specified language or fallback to plaintext
     const validLanguage = hljs.getLanguage(language) ? language : 'plaintext';
     return `<pre><code class="hljs language-${validLanguage}">${
       hljs.highlight(code, { language: validLanguage }).value
@@ -24,6 +24,7 @@ const renderer = {
   }
 };
 
+// Apply our custom renderer
 marked.use({ renderer });
 
 export interface MarkdownEditorProps {
@@ -45,15 +46,23 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
   useEffect(() => {
     try {
-      // Handle the Promise returned by marked.parse
-      marked.parse(markdownText)
-        .then(result => {
-          setHtmlOutput(result);
-          onChange?.(markdownText);
-        })
-        .catch(error => {
-          console.error('Error parsing markdown:', error);
-        });
+      // Check if marked.parse returns a Promise or string and handle accordingly
+      const result = marked.parse(markdownText);
+      if (result instanceof Promise) {
+        // Handle as Promise
+        result
+          .then(parsedHtml => {
+            setHtmlOutput(parsedHtml);
+            onChange?.(markdownText);
+          })
+          .catch(error => {
+            console.error('Error parsing markdown:', error);
+          });
+      } else {
+        // Handle as string
+        setHtmlOutput(result);
+        onChange?.(markdownText);
+      }
     } catch (error) {
       console.error('Error parsing markdown:', error);
     }
