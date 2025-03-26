@@ -9,15 +9,22 @@ import { useToast } from "@/components/ui/use-toast";
 
 // Configure marked with highlight.js for code syntax highlighting
 marked.setOptions({
-  highlight: (code, lang) => {
-    if (lang && hljs.getLanguage(lang)) {
-      return hljs.highlight(code, { language: lang }).value;
-    }
-    return hljs.highlightAuto(code).value;
-  },
-  breaks: true,
+  langPrefix: 'hljs language-', // highlight.js css expects a language-* prefix
   gfm: true,
+  breaks: true,
 });
+
+// Custom renderer for code highlighting
+const renderer = {
+  code(code: string, language: string) {
+    const validLanguage = hljs.getLanguage(language) ? language : 'plaintext';
+    return `<pre><code class="hljs language-${validLanguage}">${
+      hljs.highlight(code, { language: validLanguage }).value
+    }</code></pre>`;
+  }
+};
+
+marked.use({ renderer });
 
 export interface MarkdownEditorProps {
   initialValue?: string;
@@ -38,9 +45,15 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
   useEffect(() => {
     try {
-      const parsedHtml = marked.parse(markdownText);
-      setHtmlOutput(parsedHtml);
-      onChange?.(markdownText);
+      // Handle the Promise returned by marked.parse
+      marked.parse(markdownText)
+        .then(result => {
+          setHtmlOutput(result);
+          onChange?.(markdownText);
+        })
+        .catch(error => {
+          console.error('Error parsing markdown:', error);
+        });
     } catch (error) {
       console.error('Error parsing markdown:', error);
     }
