@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import MarkdownEditor from '@/components/MarkdownEditor';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { FileText, Github } from 'lucide-react';
+import { FileText, Github, Download } from 'lucide-react';
 
 const defaultContent = `# Welcome to the Markdown Editor
 
@@ -88,34 +88,6 @@ const Index = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSave = () => {
-    localStorage.setItem('markdown-content', markdown);
-    toast({
-      title: "Content saved",
-      description: "Your markdown has been saved to local storage.",
-      duration: 2000,
-    });
-  };
-
-  const handleLoad = () => {
-    const saved = localStorage.getItem('markdown-content');
-    if (saved) {
-      setMarkdown(saved);
-      toast({
-        title: "Content loaded",
-        description: "Your saved markdown has been loaded from local storage.",
-        duration: 2000,
-      });
-    } else {
-      toast({
-        title: "No saved content",
-        description: "No previously saved content was found in local storage.",
-        variant: "destructive",
-        duration: 2000,
-      });
-    }
-  };
-
   const handleExport = () => {
     const blob = new Blob([markdown], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
@@ -128,7 +100,7 @@ const Index = () => {
     URL.revokeObjectURL(url);
     
     toast({
-      title: "Export successful",
+      title: "Download successful",
       description: "Your markdown file has been downloaded.",
       duration: 2000,
     });
@@ -144,28 +116,13 @@ const Index = () => {
         
         <div className="flex items-center gap-3">
           <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleLoad}
-            className="glass-hover focus-ring"
-          >
-            Load
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleSave}
-            className="glass-hover focus-ring"
-          >
-            Save
-          </Button>
-          <Button 
             variant="default" 
             size="sm" 
             onClick={handleExport}
             className="button-hover focus-ring"
           >
-            Export
+            <Download size={16} className="mr-1" />
+            Download
           </Button>
           <a 
             href="https://github.com/markdown/markdown" 

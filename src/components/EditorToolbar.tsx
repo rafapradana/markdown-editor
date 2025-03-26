@@ -15,7 +15,11 @@ import {
   XSquare,
   Eye,
   Code2,
-  Laptop
+  Laptop,
+  Undo2,
+  Redo2,
+  Download,
+  FileUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -51,9 +55,16 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({ onAction, isPreviewMode }
     { label: 'Horizontal Rule', icon: <SeparatorHorizontal size={18} />, action: 'hr' },
   ];
 
+  const historyButtons: ToolbarButton[] = [
+    { label: 'Undo', icon: <Undo2 size={18} />, action: 'undo', shortcut: 'Ctrl+Z' },
+    { label: 'Redo', icon: <Redo2 size={18} />, action: 'redo', shortcut: 'Ctrl+Y' },
+  ];
+
   const utilityButtons: ToolbarButton[] = [
     { label: 'Copy All', icon: <Copy size={18} />, action: 'copy' },
     { label: 'Clear All', icon: <XSquare size={18} />, action: 'clear' },
+    { label: 'Download', icon: <Download size={18} />, action: 'export' },
+    { label: 'Import', icon: <FileUp size={18} />, action: 'import' },
     { 
       label: isPreviewMode ? 'Edit Mode' : 'Preview Mode', 
       icon: isPreviewMode ? <Laptop size={18} /> : <Eye size={18} />, 
@@ -87,6 +98,29 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({ onAction, isPreviewMode }
               <Separator orientation="vertical" className="h-6 mx-1" />
             ) : null}
           </React.Fragment>
+        ))}
+      </div>
+      
+      <Separator orientation="vertical" className="h-6 mx-1" />
+      
+      <div className="flex items-center gap-1">
+        {historyButtons.map((button) => (
+          <Tooltip key={button.action} delayDuration={300}>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(buttonClasses, 'button-hover')}
+                onClick={() => onAction(button.action)}
+                aria-label={button.label}
+              >
+                {button.icon}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="glass p-2 text-xs">
+              <p>{button.label} {button.shortcut && <span className="text-muted-foreground ml-1">({button.shortcut})</span>}</p>
+            </TooltipContent>
+          </Tooltip>
         ))}
       </div>
       

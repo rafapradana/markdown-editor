@@ -1,5 +1,5 @@
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 
 export function useEditorActions(
@@ -10,20 +10,100 @@ export function useEditorActions(
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
+  
+  // History for undo/redo functionality
+  const [history, setHistory] = useState<string[]>([initialValue]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+
+  // Add to history when markdown text changes
+  useEffect(() => {
+    const lastHistoryItem = history[historyIndex];
+    if (markdownText !== lastHistoryItem) {
+      // Add new state to history, remove any future states
+      const newHistory = [...history.slice(0, historyIndex + 1), markdownText];
+      // Limit history size to prevent memory issues
+      if (newHistory.length > 100) {
+        newHistory.shift();
+      }
+      setHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
+    }
+  }, [markdownText]);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMarkdownText(e.target.value);
+    if (onChange) {
+      onChange(e.target.value);
+    }
   };
 
-  const handleToolbarAction = (action: string, value?: string) => {
-    if (!textareaRef.current) return;
+  const handlePreviewChange = (content: string) => {
+    setMarkdownText(content);
+    if (onChange) {
+      onChange(content);
+    }
+  };
+
+  const performUndo = () => {
+    if (historyIndex > 0) {
+      setHistoryIndex(historyIndex - 1);
+      setMarkdownText(history[historyIndex - 1]);
+      if (onChange) {
+        onChange(history[historyIndex - 1]);
+      }
+    }
+  };
+
+  const performRedo = () => {
+    if (historyIndex < history.length - 1) {
+      setHistoryIndex(historyIndex + 1);
+      setMarkdownText(history[historyIndex + 1]);
+      if (onChange) {
+        onChange(history[historyIndex + 1]);
+      }
+    }
+  };
+
+  const importMarkdownFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      setMarkdownText(content);
+      if (onChange) {
+        onChange(content);
+      }
+      toast({
+        title: "Import successful",
+        description: `Imported ${file.name}`,
+        duration: 2000,
+      });
+    };
+    reader.onerror = () => {
+      toast({
+        title: "Import failed",
+        description: "Could not read the file",
+        variant: "destructive",
+        duration: 2000,
+      });
+    };
+    reader.readAsText(file);
+
+    // Reset the input so the same file can be imported again
+    e.target.value = '';
+  };
+
+  const handleToolbarAction = (action: string, value?: any) => {
+    if (!textareaRef.current && action !== 'togglePreview' && action !== 'export' && action !== 'import' && action !== 'importFile' && !isPreviewMode) return;
 
     const textarea = textareaRef.current;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = markdownText.substring(start, end);
-    const beforeSelection = markdownText.substring(0, start);
-    const afterSelection = markdownText.substring(end);
+    const start = textarea?.selectionStart || 0;
+    const end = textarea?.selectionEnd || 0;
+    const selectedText = textarea ? markdownText.substring(start, end) : '';
+    const beforeSelection = textarea ? markdownText.substring(0, start) : '';
+    const afterSelection = textarea ? markdownText.substring(end) : '';
 
     let newText = '';
     let newCursorPos = 0;
@@ -153,6 +233,36 @@ export function useEditorActions(
           return;
         }
         break;
+      case 'undo':
+        performUndo();
+        return;
+      case 'redo':
+        performRedo();
+        return;
+      case 'export':
+        const blob = new Blob([markdownText], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'document.md';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        toast({
+          title: "Download successful",
+          description: "Your markdown file has been downloaded.",
+          duration: 2000,
+        });
+        return;
+      case 'import':
+        // Trigger file input click
+        document.getElementById('markdown-file-input')?.click();
+        return;
+      case 'importFile':
+        importMarkdownFile(value);
+        return;
       case 'togglePreview':
         setIsPreviewMode(!isPreviewMode);
         return;
@@ -168,13 +278,15 @@ export function useEditorActions(
     }
     
     // Set focus back to textarea and cursor position after state update
-    setTimeout(() => {
-      if (textareaRef.current) {
-        textareaRef.current.focus();
-        textareaRef.current.selectionStart = newCursorPos;
-        textareaRef.current.selectionEnd = newCursorPos;
-      }
-    }, 0);
+    if (!isPreviewMode) {
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.focus();
+          textareaRef.current.selectionStart = newCursorPos;
+          textareaRef.current.selectionEnd = newCursorPos;
+        }
+      }, 0);
+    }
   };
 
   return {
@@ -184,6 +296,9 @@ export function useEditorActions(
     setIsPreviewMode,
     textareaRef,
     handleTextChange,
-    handleToolbarAction
+    handlePreviewChange,
+    handleToolbarAction,
+    history,
+    historyIndex
   };
 }

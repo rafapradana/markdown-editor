@@ -22,6 +22,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     isPreviewMode,
     textareaRef,
     handleTextChange,
+    handlePreviewChange,
     handleToolbarAction
   } = useEditorActions(initialValue, onChange);
 
@@ -40,8 +41,18 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         <MarkdownPreview 
           markdownText={markdownText}
           isPreviewMode={isPreviewMode}
+          onContentChange={handlePreviewChange}
         />
       </div>
+
+      {/* Hidden file input for import functionality */}
+      <input 
+        type="file" 
+        id="markdown-file-input" 
+        accept=".md" 
+        style={{ display: 'none' }} 
+        onChange={(e) => handleToolbarAction('importFile', e)} 
+      />
     </div>
   );
 };
