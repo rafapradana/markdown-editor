@@ -1,21 +1,7 @@
 
 import React from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogClose
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { X, Keyboard } from 'lucide-react';
-
-interface ShortcutGroup {
-  title: string;
-  shortcuts: { key: string; description: string }[];
-}
 
 interface ShortcutsDialogProps {
   open: boolean;
@@ -23,75 +9,95 @@ interface ShortcutsDialogProps {
 }
 
 const ShortcutsDialog: React.FC<ShortcutsDialogProps> = ({ open, onOpenChange }) => {
-  const shortcutGroups: ShortcutGroup[] = [
-    {
-      title: 'Text Formatting',
-      shortcuts: [
-        { key: 'Ctrl+B', description: 'Bold text' },
-        { key: 'Ctrl+I', description: 'Italic text' },
-        { key: 'Ctrl+K', description: 'Insert link' },
-        { key: 'Ctrl+E', description: 'Inline code' },
-        { key: 'Ctrl+Q', description: 'Blockquote' },
-        { key: 'Ctrl+H', description: 'Insert heading' }
-      ]
-    },
-    {
-      title: 'Lists and Structure',
-      shortcuts: [
-        { key: 'Ctrl+U', description: 'Bullet list' },
-        { key: 'Ctrl+O', description: 'Numbered list' },
-        { key: 'Ctrl+Shift+C', description: 'Code block' },
-        { key: 'Ctrl+Alt+I', description: 'Insert image' }
-      ]
-    },
-    {
-      title: 'Editor Controls',
-      shortcuts: [
-        { key: 'Ctrl+Z', description: 'Undo' },
-        { key: 'Ctrl+Y', description: 'Redo' },
-        { key: 'Ctrl+S', description: 'Download markdown' },
-        { key: 'Ctrl+P', description: 'Toggle preview mode' },
-        { key: 'F1 or ?', description: 'Show this shortcuts dialog' }
-      ]
-    }
+  // Define shortcut categories
+  const formattingShortcuts = [
+    { key: 'Ctrl+B', description: 'Bold text' },
+    { key: 'Ctrl+I', description: 'Italic text' },
+    { key: 'Ctrl+K', description: 'Insert link' },
+    { key: 'Ctrl+E', description: 'Inline code' },
+    { key: 'Ctrl+Shift+C', description: 'Code block' },
+    { key: 'Ctrl+Alt+I', description: 'Insert image' },
+    { key: 'Ctrl+Q', description: 'Blockquote' },
+  ];
+
+  const headingShortcuts = [
+    { key: 'Ctrl+1', description: 'Heading 1' },
+    { key: 'Ctrl+2', description: 'Heading 2' },
+    { key: 'Ctrl+3', description: 'Heading 3' },
+    { key: 'Ctrl+4', description: 'Heading 4' },
+    { key: 'Ctrl+5', description: 'Heading 5' },
+    { key: 'Ctrl+6', description: 'Heading 6' },
+  ];
+
+  const listShortcuts = [
+    { key: 'Ctrl+U', description: 'Unordered list' },
+    { key: 'Ctrl+O', description: 'Ordered list' },
+  ];
+
+  const editorShortcuts = [
+    { key: 'Ctrl+Z', description: 'Undo' },
+    { key: 'Ctrl+Y', description: 'Redo' },
+    { key: 'Ctrl+S', description: 'Download document' },
+    { key: 'Ctrl+P', description: 'Toggle preview mode' },
+    { key: 'F11', description: 'Toggle fullscreen' },
+    { key: '? or F1', description: 'Show keyboard shortcuts' },
   ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md md:max-w-lg">
-        <DialogHeader className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Keyboard className="h-5 w-5 text-primary" />
-            <DialogTitle>Keyboard Shortcuts</DialogTitle>
-          </div>
-          <DialogClose asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </Button>
-          </DialogClose>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Keyboard Shortcuts</DialogTitle>
         </DialogHeader>
-        <DialogDescription className="text-sm text-muted-foreground pb-2">
-          Use these keyboard shortcuts to speed up your workflow
-        </DialogDescription>
-        
-        <ScrollArea className="max-h-[60vh]">
-          <div className="space-y-6 pr-4 py-2">
-            {shortcutGroups.map((group, index) => (
-              <div key={index} className="space-y-2">
-                <h3 className="text-sm font-medium text-primary">{group.title}</h3>
-                <div className="space-y-1">
-                  {group.shortcuts.map((shortcut, idx) => (
-                    <div key={idx} className="flex justify-between text-sm py-1.5">
-                      <span className="text-muted-foreground">{shortcut.description}</span>
-                      <kbd className="bg-muted px-2 py-0.5 rounded text-xs font-mono ml-2">
-                        {shortcut.key}
-                      </kbd>
-                    </div>
-                  ))}
-                </div>
+        <ScrollArea className="h-[70vh] sm:h-[450px] pr-4">
+          <div className="grid gap-6">
+            <div>
+              <h3 className="text-sm font-medium text-foreground/80 mb-3 pb-1 border-b">Text Formatting</h3>
+              <div className="grid gap-2.5">
+                {formattingShortcuts.map((shortcut) => (
+                  <div key={shortcut.key} className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{shortcut.description}</span>
+                    <kbd className="px-2 py-0.5 bg-muted rounded">{shortcut.key}</kbd>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+
+            <div>
+              <h3 className="text-sm font-medium text-foreground/80 mb-3 pb-1 border-b">Headings</h3>
+              <div className="grid gap-2.5">
+                {headingShortcuts.map((shortcut) => (
+                  <div key={shortcut.key} className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{shortcut.description}</span>
+                    <kbd className="px-2 py-0.5 bg-muted rounded">{shortcut.key}</kbd>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-medium text-foreground/80 mb-3 pb-1 border-b">Lists</h3>
+              <div className="grid gap-2.5">
+                {listShortcuts.map((shortcut) => (
+                  <div key={shortcut.key} className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{shortcut.description}</span>
+                    <kbd className="px-2 py-0.5 bg-muted rounded">{shortcut.key}</kbd>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-medium text-foreground/80 mb-3 pb-1 border-b">Editor Controls</h3>
+              <div className="grid gap-2.5">
+                {editorShortcuts.map((shortcut) => (
+                  <div key={shortcut.key} className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{shortcut.description}</span>
+                    <kbd className="px-2 py-0.5 bg-muted rounded">{shortcut.key}</kbd>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </ScrollArea>
       </DialogContent>

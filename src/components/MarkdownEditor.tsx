@@ -1,10 +1,11 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import EditorToolbar from './EditorToolbar';
 import MarkdownTextarea from './MarkdownTextarea';
 import MarkdownPreview from './MarkdownPreview';
 import { useEditorActions } from '@/hooks/useEditorActions';
+import DownloadDialog from './DownloadDialog';
 
 export interface MarkdownEditorProps {
   initialValue?: string;
@@ -17,9 +18,12 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   className,
   onChange,
 }) => {
+  const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false);
+  
   const {
     markdownText,
     isPreviewMode,
+    isFullscreen,
     textareaRef,
     handleTextChange,
     handlePreviewChange,
@@ -54,10 +58,6 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             e.preventDefault();
             handleToolbarAction('link');
             break;
-          case 'h':
-            e.preventDefault();
-            handleToolbarAction('heading');
-            break;
           case 'q':
             e.preventDefault();
             handleToolbarAction('blockquote');
@@ -84,11 +84,35 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             break;
           case 's':
             e.preventDefault();
-            handleToolbarAction('export');
+            setIsDownloadDialogOpen(true);
             break;
           case 'p':
             e.preventDefault();
             handleToolbarAction('togglePreview');
+            break;
+          case '1':
+            e.preventDefault();
+            handleToolbarAction('heading1');
+            break;
+          case '2':
+            e.preventDefault();
+            handleToolbarAction('heading2');
+            break;
+          case '3':
+            e.preventDefault();
+            handleToolbarAction('heading3');
+            break;
+          case '4':
+            e.preventDefault();
+            handleToolbarAction('heading4');
+            break;
+          case '5':
+            e.preventDefault();
+            handleToolbarAction('heading5');
+            break;
+          case '6':
+            e.preventDefault();
+            handleToolbarAction('heading6');
             break;
         }
       }
@@ -104,6 +128,12 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         e.preventDefault();
         handleToolbarAction('image');
       }
+      
+      // F11 for fullscreen
+      if (e.key === 'F11') {
+        e.preventDefault();
+        handleToolbarAction('fullscreen');
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -113,8 +143,19 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   }, [handleToolbarAction, textareaRef]);
 
   return (
-    <div className={cn('w-full h-full flex flex-col bg-background rounded-lg animate-fade-in', className)}>
-      <EditorToolbar onAction={handleToolbarAction} isPreviewMode={isPreviewMode} />
+    <div 
+      className={cn(
+        'w-full h-full flex flex-col bg-background rounded-lg animate-fade-in',
+        isFullscreen ? 'fixed top-0 left-0 z-50 rounded-none' : '',
+        className
+      )}
+    >
+      <EditorToolbar 
+        onAction={handleToolbarAction} 
+        isPreviewMode={isPreviewMode} 
+        isFullscreen={isFullscreen}
+        onOpenDownloadDialog={() => setIsDownloadDialogOpen(true)}
+      />
       
       <div className="flex-1 flex overflow-hidden rounded-b-lg bg-editor-background">
         <MarkdownTextarea
@@ -130,6 +171,13 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
           onContentChange={handlePreviewChange}
         />
       </div>
+
+      {/* Download dialog */}
+      <DownloadDialog 
+        open={isDownloadDialogOpen} 
+        onOpenChange={setIsDownloadDialogOpen} 
+        markdownContent={markdownText}
+      />
 
       {/* Hidden file input for import functionality */}
       <input 

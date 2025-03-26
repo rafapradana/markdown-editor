@@ -8,6 +8,7 @@ export function useEditorActions(
 ) {
   const [markdownText, setMarkdownText] = useState(initialValue);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
   
@@ -64,6 +65,10 @@ export function useEditorActions(
     }
   };
 
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+  };
+
   const importMarkdownFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -96,7 +101,7 @@ export function useEditorActions(
   };
 
   const handleToolbarAction = (action: string, value?: any) => {
-    if (!textareaRef.current && action !== 'togglePreview' && action !== 'export' && action !== 'import' && action !== 'importFile' && !isPreviewMode) return;
+    if (!textareaRef.current && action !== 'togglePreview' && action !== 'export' && action !== 'import' && action !== 'importFile' && action !== 'fullscreen' && !isPreviewMode) return;
 
     const textarea = textareaRef.current;
     const start = textarea?.selectionStart || 0;
@@ -109,6 +114,22 @@ export function useEditorActions(
     let newCursorPos = 0;
 
     switch (action) {
+      case 'heading1':
+      case 'heading2':
+      case 'heading3':
+      case 'heading4':
+      case 'heading5':
+      case 'heading6':
+        const headingLevel = action.charAt(action.length - 1);
+        const headingMarker = '#'.repeat(Number(headingLevel));
+        if (selectedText) {
+          newText = `${beforeSelection}${headingMarker} ${selectedText}${afterSelection}`;
+          newCursorPos = start + headingMarker.length + 1 + selectedText.length;
+        } else {
+          newText = `${beforeSelection}${headingMarker} Heading ${headingLevel}${afterSelection}`;
+          newCursorPos = start + headingMarker.length + 10;
+        }
+        break;
       case 'heading':
         if (selectedText) {
           newText = `${beforeSelection}# ${selectedText}${afterSelection}`;
@@ -240,21 +261,8 @@ export function useEditorActions(
         performRedo();
         return;
       case 'export':
-        const blob = new Blob([markdownText], { type: 'text/markdown' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'document.md';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        toast({
-          title: "Download successful",
-          description: "Your markdown file has been downloaded.",
-          duration: 2000,
-        });
+      case 'download':
+        // We'll use openDownloadDialog in the component
         return;
       case 'import':
         // Trigger file input click
@@ -265,6 +273,9 @@ export function useEditorActions(
         return;
       case 'togglePreview':
         setIsPreviewMode(!isPreviewMode);
+        return;
+      case 'fullscreen':
+        toggleFullscreen();
         return;
       default:
         return;
@@ -294,6 +305,8 @@ export function useEditorActions(
     setMarkdownText,
     isPreviewMode,
     setIsPreviewMode,
+    isFullscreen,
+    setIsFullscreen,
     textareaRef,
     handleTextChange,
     handlePreviewChange,
