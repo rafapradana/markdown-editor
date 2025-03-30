@@ -511,13 +511,13 @@ export function AppGuide({ open, onOpenChange }: AppGuideProps) {
                     Blockquotes & Dividers
                   </h3>
                   <pre className="bg-muted p-3 rounded-md text-sm overflow-auto">
-                    > This is a blockquote{'\n'}
-                    > It can span multiple lines{'\n\n'}
-                    > Nested blockquotes{'\n'}
-                    >> Second level{'\n'}
-                    >>> Third level{'\n\n'}
-                    ---{'\n'}
-                    Horizontal rule (divider)
+                    {'> This is a blockquote\n'}
+                    {'> It can span multiple lines\n\n'}
+                    {'> Nested blockquotes\n'}
+                    {'>> Second level\n'}
+                    {'>>> Third level\n\n'}
+                    {'---\n'}
+                    {'Horizontal rule (divider)'}
                   </pre>
                 </div>
                 
