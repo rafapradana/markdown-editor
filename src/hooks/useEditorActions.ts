@@ -1,303 +1,305 @@
-
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/components/ui/use-toast';
+
+interface EditorHistory {
+  past: string[];
+  future: string[];
+}
 
 export function useEditorActions(
   initialValue = '# Hello, World!\n\nStart writing your markdown here...',
   onChange?: (value: string) => void
 ) {
-  const [markdownText, setMarkdownText] = useState(initialValue);
+  // Try to load from localStorage first
+  const getSavedContent = () => {
+    const savedContent = localStorage.getItem('markdown-editor-content');
+    return savedContent || initialValue;
+  };
+
+  const initialContent = getSavedContent();
+  const [markdownText, setMarkdownText] = useState<string>(initialContent);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
   
-  // History for undo/redo functionality
-  const [history, setHistory] = useState<string[]>([initialValue]);
-  const [historyIndex, setHistoryIndex] = useState(0);
+  const [history, setHistory] = useState<EditorHistory>({ 
+    past: [initialContent], 
+    future: [] 
+  });
 
-  // Add to history when markdown text changes
-  useEffect(() => {
-    const lastHistoryItem = history[historyIndex];
-    if (markdownText !== lastHistoryItem) {
-      // Add new state to history, remove any future states
-      const newHistory = [...history.slice(0, historyIndex + 1), markdownText];
-      // Limit history size to prevent memory issues
-      if (newHistory.length > 100) {
-        newHistory.shift();
-      }
-      setHistory(newHistory);
-      setHistoryIndex(newHistory.length - 1);
+  // Handle text changes
+  const handleTextChange = (text: string) => {
+    setMarkdownText(text);
+    
+    // Clear future history when new changes are made
+    setHistory({
+      past: [...history.past, text],
+      future: []
+    });
+    
+    // Limit history size
+    if (history.past.length > 100) {
+      setHistory(prev => ({
+        past: prev.past.slice(-100),
+        future: prev.future
+      }));
     }
-  }, [markdownText]);
-
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMarkdownText(e.target.value);
+    
     if (onChange) {
-      onChange(e.target.value);
+      onChange(text);
     }
   };
 
-  const handlePreviewChange = (content: string) => {
-    setMarkdownText(content);
-    if (onChange) {
-      onChange(content);
-    }
-  };
-
-  const performUndo = () => {
-    if (historyIndex > 0) {
-      setHistoryIndex(historyIndex - 1);
-      setMarkdownText(history[historyIndex - 1]);
-      if (onChange) {
-        onChange(history[historyIndex - 1]);
-      }
-    }
-  };
-
-  const performRedo = () => {
-    if (historyIndex < history.length - 1) {
-      setHistoryIndex(historyIndex + 1);
-      setMarkdownText(history[historyIndex + 1]);
-      if (onChange) {
-        onChange(history[historyIndex + 1]);
-      }
-    }
+  // Handle preview content changes
+  const handlePreviewChange = (html: string) => {
+    // You can add processing here if needed
   };
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
   };
 
-  const importMarkdownFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
-      setMarkdownText(content);
-      if (onChange) {
-        onChange(content);
-      }
-      toast({
-        title: "Import successful",
-        description: `Imported ${file.name}`,
-        duration: 2000,
-      });
-    };
-    reader.onerror = () => {
-      toast({
-        title: "Import failed",
-        description: "Could not read the file",
-        variant: "destructive",
-        duration: 2000,
-      });
-    };
-    reader.readAsText(file);
-
-    // Reset the input so the same file can be imported again
-    e.target.value = '';
+  const togglePreviewMode = () => {
+    setIsPreviewMode(!isPreviewMode);
   };
 
-  const handleToolbarAction = (action: string, value?: any) => {
-    if (!textareaRef.current && action !== 'togglePreview' && action !== 'export' && action !== 'import' && action !== 'importFile' && action !== 'fullscreen' && !isPreviewMode) return;
+  const performUndo = () => {
+    if (history.past.length > 1) {
+      const previous = history.past[history.past.length - 2];
+      const newPast = history.past.slice(0, -1);
+      
+      setHistory({
+        past: newPast,
+        future: [markdownText, ...history.future]
+      });
+      
+      setMarkdownText(previous);
+      
+      if (onChange) {
+        onChange(previous);
+      }
+    }
+  };
+
+  const performRedo = () => {
+    if (history.future.length > 0) {
+      const next = history.future[0];
+      
+      setHistory({
+        past: [...history.past, next],
+        future: history.future.slice(1)
+      });
+      
+      setMarkdownText(next);
+      
+      if (onChange) {
+        onChange(next);
+      }
+    }
+  };
+
+  // Toolbar action handler
+  const handleToolbarAction = (action: string, e?: any) => {
+    if (!textareaRef.current && action !== 'togglePreview' && 
+        action !== 'importFile' && action !== 'fullscreen' && !isPreviewMode) return;
 
     const textarea = textareaRef.current;
-    const start = textarea?.selectionStart || 0;
-    const end = textarea?.selectionEnd || 0;
-    const selectedText = textarea ? markdownText.substring(start, end) : '';
-    const beforeSelection = textarea ? markdownText.substring(0, start) : '';
-    const afterSelection = textarea ? markdownText.substring(end) : '';
-
-    let newText = '';
-    let newCursorPos = 0;
+    const selectionStart = textarea ? textarea.selectionStart : 0;
+    const selectionEnd = textarea ? textarea.selectionEnd : 0;
+    const selectedText = textarea ? textarea.value.substring(selectionStart, selectionEnd) : '';
+    const beforeSelection = textarea ? textarea.value.substring(0, selectionStart) : '';
+    const afterSelection = textarea ? textarea.value.substring(selectionEnd) : '';
+    
+    let newText = markdownText;
+    let newCursorPos = selectionStart;
 
     switch (action) {
-      case 'heading1':
-      case 'heading2':
-      case 'heading3':
-      case 'heading4':
-      case 'heading5':
-      case 'heading6':
-        const headingLevel = action.charAt(action.length - 1);
-        const headingMarker = '#'.repeat(Number(headingLevel));
-        if (selectedText) {
-          newText = `${beforeSelection}${headingMarker} ${selectedText}${afterSelection}`;
-          newCursorPos = start + headingMarker.length + 1 + selectedText.length;
-        } else {
-          newText = `${beforeSelection}${headingMarker} Heading ${headingLevel}${afterSelection}`;
-          newCursorPos = start + headingMarker.length + 10;
-        }
-        break;
-      case 'heading':
-        if (selectedText) {
-          newText = `${beforeSelection}# ${selectedText}${afterSelection}`;
-          newCursorPos = start + 2 + selectedText.length;
-        } else {
-          newText = `${beforeSelection}# Heading${afterSelection}`;
-          newCursorPos = start + 9;
-        }
-        break;
       case 'bold':
-        if (selectedText) {
-          newText = `${beforeSelection}**${selectedText}**${afterSelection}`;
-          newCursorPos = start + 2 + selectedText.length + 2;
-        } else {
-          newText = `${beforeSelection}**bold text**${afterSelection}`;
-          newCursorPos = start + 12;
-        }
+        newText = `${beforeSelection}**${selectedText || 'bold text'}**${afterSelection}`;
+        newCursorPos = selectedText 
+          ? selectionStart + 2 
+          : selectionStart + 2 + 'bold text'.length;
         break;
+
       case 'italic':
-        if (selectedText) {
-          newText = `${beforeSelection}*${selectedText}*${afterSelection}`;
-          newCursorPos = start + 1 + selectedText.length + 1;
-        } else {
-          newText = `${beforeSelection}*italic text*${afterSelection}`;
-          newCursorPos = start + 13;
-        }
+        newText = `${beforeSelection}*${selectedText || 'italic text'}*${afterSelection}`;
+        newCursorPos = selectedText 
+          ? selectionStart + 1 
+          : selectionStart + 1 + 'italic text'.length;
         break;
+
+      case 'heading1':
+        newText = `${beforeSelection}# ${selectedText || 'Heading 1'}${afterSelection}`;
+        newCursorPos = selectedText 
+          ? selectionStart + 2 
+          : selectionStart + 2 + 'Heading 1'.length;
+        break;
+
+      case 'heading2':
+        newText = `${beforeSelection}## ${selectedText || 'Heading 2'}${afterSelection}`;
+        newCursorPos = selectedText 
+          ? selectionStart + 3 
+          : selectionStart + 3 + 'Heading 2'.length;
+        break;
+
+      case 'heading3':
+        newText = `${beforeSelection}### ${selectedText || 'Heading 3'}${afterSelection}`;
+        newCursorPos = selectedText 
+          ? selectionStart + 4 
+          : selectionStart + 4 + 'Heading 3'.length;
+        break;
+
+      case 'heading4':
+        newText = `${beforeSelection}#### ${selectedText || 'Heading 4'}${afterSelection}`;
+        newCursorPos = selectedText 
+          ? selectionStart + 5 
+          : selectionStart + 5 + 'Heading 4'.length;
+        break;
+
+      case 'heading5':
+        newText = `${beforeSelection}##### ${selectedText || 'Heading 5'}${afterSelection}`;
+        newCursorPos = selectedText 
+          ? selectionStart + 6 
+          : selectionStart + 6 + 'Heading 5'.length;
+        break;
+
+      case 'heading6':
+        newText = `${beforeSelection}###### ${selectedText || 'Heading 6'}${afterSelection}`;
+        newCursorPos = selectedText 
+          ? selectionStart + 7
+          : selectionStart + 7 + 'Heading 6'.length;
+        break;
+
       case 'blockquote':
-        if (selectedText) {
-          newText = `${beforeSelection}> ${selectedText}${afterSelection}`;
-          newCursorPos = start + 2 + selectedText.length;
-        } else {
-          newText = `${beforeSelection}> Blockquote${afterSelection}`;
-          newCursorPos = start + 12;
-        }
+        newText = `${beforeSelection}> ${selectedText || 'Blockquote'}${afterSelection}`;
+        newCursorPos = selectedText 
+          ? selectionStart + 2 
+          : selectionStart + 2 + 'Blockquote'.length;
         break;
+
       case 'link':
-        if (selectedText) {
-          newText = `${beforeSelection}[${selectedText}](url)${afterSelection}`;
-          newCursorPos = start + selectedText.length + 3;
-        } else {
-          newText = `${beforeSelection}[link text](url)${afterSelection}`;
-          newCursorPos = start + 12;
-        }
+        newText = `${beforeSelection}[${selectedText || 'Link text'}](url)${afterSelection}`;
+        newCursorPos = selectedText 
+          ? selectionStart + selectedText.length + 3 
+          : selectionStart + 'Link text'.length + 3;
         break;
+
       case 'image':
-        if (selectedText) {
-          newText = `${beforeSelection}![${selectedText}](image-url)${afterSelection}`;
-          newCursorPos = start + selectedText.length + 13;
-        } else {
-          newText = `${beforeSelection}![alt text](image-url)${afterSelection}`;
-          newCursorPos = start + 21;
-        }
+        newText = `${beforeSelection}![${selectedText || 'Alt text'}](url)${afterSelection}`;
+        newCursorPos = selectedText 
+          ? selectionStart + selectedText.length + 4 
+          : selectionStart + 'Alt text'.length + 4;
         break;
+
       case 'code':
-        if (selectedText) {
-          newText = `${beforeSelection}\`\`\`\n${selectedText}\n\`\`\`${afterSelection}`;
-          newCursorPos = start + 4 + selectedText.length + 4;
-        } else {
-          newText = `${beforeSelection}\`\`\`\ncode block\n\`\`\`${afterSelection}`;
-          newCursorPos = start + 15;
-        }
+        newText = `${beforeSelection}\`\`\`\n${selectedText || 'Code block'}\n\`\`\`${afterSelection}`;
+        newCursorPos = selectedText 
+          ? selectionStart + 4 
+          : selectionStart + 4 + 'Code block'.length;
         break;
+
       case 'inlineCode':
-        if (selectedText) {
-          newText = `${beforeSelection}\`${selectedText}\`${afterSelection}`;
-          newCursorPos = start + 1 + selectedText.length + 1;
-        } else {
-          newText = `${beforeSelection}\`inline code\`${afterSelection}`;
-          newCursorPos = start + 13;
-        }
+        newText = `${beforeSelection}\`${selectedText || 'code'}\`${afterSelection}`;
+        newCursorPos = selectedText 
+          ? selectionStart + 1
+          : selectionStart + 1 + 'code'.length;
         break;
+
       case 'ul':
-        if (selectedText) {
-          const lines = selectedText.split('\n');
-          const listItems = lines.map(line => `- ${line}`).join('\n');
-          newText = `${beforeSelection}${listItems}${afterSelection}`;
-          newCursorPos = start + listItems.length;
-        } else {
-          newText = `${beforeSelection}- List item${afterSelection}`;
-          newCursorPos = start + 11;
-        }
+        newText = `${beforeSelection}- ${selectedText || 'List item'}${afterSelection}`;
+        newCursorPos = selectedText 
+          ? selectionStart + 2 
+          : selectionStart + 2 + 'List item'.length;
         break;
+
       case 'ol':
-        if (selectedText) {
-          const lines = selectedText.split('\n');
-          const listItems = lines.map((line, index) => `${index + 1}. ${line}`).join('\n');
-          newText = `${beforeSelection}${listItems}${afterSelection}`;
-          newCursorPos = start + listItems.length;
-        } else {
-          newText = `${beforeSelection}1. List item${afterSelection}`;
-          newCursorPos = start + 12;
-        }
+        newText = `${beforeSelection}1. ${selectedText || 'List item'}${afterSelection}`;
+        newCursorPos = selectedText 
+          ? selectionStart + 3 
+          : selectionStart + 3 + 'List item'.length;
         break;
+
       case 'hr':
         newText = `${beforeSelection}\n---\n${afterSelection}`;
-        newCursorPos = start + 5;
+        newCursorPos = selectionStart + 5;
         break;
-      case 'copy':
-        navigator.clipboard.writeText(markdownText)
-          .then(() => {
-            toast({
-              title: "Copied to clipboard",
-              description: "Markdown content has been copied to your clipboard.",
-              duration: 2000,
-            });
-          })
-          .catch(err => {
-            toast({
-              title: "Failed to copy",
-              description: "Could not copy to clipboard: " + err.message,
-              variant: "destructive",
-              duration: 2000,
-            });
-          });
+
+      case 'undo':
+        performUndo();
         return;
+
+      case 'redo':
+        performRedo();
+        return;
+
+      case 'copy':
+        navigator.clipboard.writeText(markdownText);
+        toast({
+          title: "Copied to clipboard",
+          description: "Markdown content has been copied to your clipboard",
+          duration: 3000,
+        });
+        return;
+
       case 'clear':
-        if (window.confirm('Are you sure you want to clear the editor?')) {
+        if (confirm('Are you sure you want to clear all content?')) {
           newText = '';
           newCursorPos = 0;
         } else {
           return;
         }
         break;
-      case 'undo':
-        performUndo();
-        return;
-      case 'redo':
-        performRedo();
-        return;
-      case 'export':
-      case 'download':
-        // We'll use openDownloadDialog in the component
-        return;
-      case 'import':
-        // Trigger file input click
-        document.getElementById('markdown-file-input')?.click();
-        return;
-      case 'importFile':
-        importMarkdownFile(value);
-        return;
+
       case 'togglePreview':
-        setIsPreviewMode(!isPreviewMode);
+        togglePreviewMode();
         return;
+
       case 'fullscreen':
         toggleFullscreen();
         return;
+
+      case 'import':
+        document.getElementById('markdown-file-input')?.click();
+        return;
+
+      case 'importFile':
+        if (e && e.target && e.target.files && e.target.files[0]) {
+          const file = e.target.files[0];
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            if (event.target) {
+              const content = event.target.result as string;
+              setMarkdownText(content);
+              if (onChange) {
+                onChange(content);
+              }
+            }
+          };
+          reader.readAsText(file);
+          e.target.value = '';
+        }
+        return;
+
       default:
         return;
     }
 
+    // Update text
     setMarkdownText(newText);
     
-    // Update the onChange handler if provided
     if (onChange) {
       onChange(newText);
     }
-    
-    // Set focus back to textarea and cursor position after state update
-    if (!isPreviewMode) {
-      setTimeout(() => {
-        if (textareaRef.current) {
-          textareaRef.current.focus();
-          textareaRef.current.selectionStart = newCursorPos;
-          textareaRef.current.selectionEnd = newCursorPos;
-        }
-      }, 0);
-    }
+
+    // Set focus and cursor position
+    setTimeout(() => {
+      if (textarea) {
+        textarea.focus();
+        textarea.selectionStart = newCursorPos;
+        textarea.selectionEnd = newCursorPos;
+      }
+    }, 0);
   };
 
   return {
@@ -311,7 +313,5 @@ export function useEditorActions(
     handleTextChange,
     handlePreviewChange,
     handleToolbarAction,
-    history,
-    historyIndex
   };
 }

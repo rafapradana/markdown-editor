@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import MarkdownEditor from '@/components/MarkdownEditor';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { FileText, Download, Keyboard } from 'lucide-react';
+import { Download, Keyboard } from 'lucide-react';
 import ShortcutsDialog from '@/components/ShortcutsDialog';
 import DownloadDialog from '@/components/DownloadDialog';
 import { useMarkdownParser } from '@/hooks/useMarkdownParser';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useTheme } from '@/lib/theme-provider';
 
 const defaultContent = `# Welcome to the Markdown Editor
 
@@ -84,6 +85,7 @@ const Index = () => {
   const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false);
   const { toast } = useToast();
   const { htmlOutput } = useMarkdownParser(markdown);
+  const { theme } = useTheme();
 
   useEffect(() => {
     // Reset animation after initial load
@@ -118,7 +120,11 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <header className={`glass px-6 py-3 border-b border-border/40 flex items-center justify-between transition-all duration-500 ${isAnimating ? 'animate-slide-in' : ''}`}>
         <div className="flex items-center gap-2">
-          <FileText className="h-6 w-6 text-primary" />
+          <img 
+            src={theme === 'dark' ? '/logo-white.png' : '/logo.png'} 
+            alt="Markdown Editor Logo" 
+            className="h-6 w-auto" 
+          />
           <h1 className="text-xl font-medium">Markdown Editor</h1>
         </div>
         

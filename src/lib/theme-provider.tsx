@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-type Theme = 'light' | 'dark' | 'cool' | 'warm' | 'zen-garden' | 'sakura-dawn';
+type Theme = 'light' | 'dark' | 'cool' | 'warm' | 'matcha' | 'sakura';
 
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -17,7 +17,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   // Get initial theme from local storage or default to system preference
   const [theme, setTheme] = useState<Theme>(() => {
     const savedTheme = localStorage.getItem('theme') as Theme;
-    if (savedTheme && ['light', 'dark', 'cool', 'warm', 'zen-garden', 'sakura-dawn'].includes(savedTheme)) {
+    if (savedTheme && ['light', 'dark', 'cool', 'warm', 'matcha', 'sakura'].includes(savedTheme)) {
       return savedTheme;
     }
     
@@ -34,7 +34,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     const root = document.documentElement;
     
     // Remove previous theme classes
-    root.classList.remove('light', 'dark', 'cool', 'warm', 'zen-garden', 'sakura-dawn');
+    root.classList.remove('light', 'dark', 'cool', 'warm', 'matcha', 'sakura');
     
     // Add the current theme class
     root.classList.add(theme);

@@ -20,8 +20,8 @@ export function ThemeToggle() {
           {theme === 'dark' && <Moon size={18} className="text-foreground" />}
           {theme === 'cool' && <Droplet size={18} className="text-foreground" />}
           {theme === 'warm' && <FlameIcon size={18} className="text-foreground" />}
-          {theme === 'zen-garden' && <Leaf size={18} className="text-foreground" />}
-          {theme === 'sakura-dawn' && <Cherry size={18} className="text-foreground" />}
+          {theme === 'matcha' && <Leaf size={18} className="text-foreground" />}
+          {theme === 'sakura' && <Cherry size={18} className="text-foreground" />}
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
@@ -42,13 +42,13 @@ export function ThemeToggle() {
           <FlameIcon size={16} className="mr-2" />
           <span>Warm Orange</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('zen-garden')}>
+        <DropdownMenuItem onClick={() => setTheme('matcha')}>
           <Leaf size={16} className="mr-2" />
-          <span>Zen Garden</span>
+          <span>Matcha</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('sakura-dawn')}>
+        <DropdownMenuItem onClick={() => setTheme('sakura')}>
           <Cherry size={16} className="mr-2" />
-          <span>Sakura Dawn</span>
+          <span>Sakura</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

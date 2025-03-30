@@ -3,8 +3,17 @@ import { cn } from '@/lib/utils';
 import EditorToolbar from './EditorToolbar';
 import MarkdownTextarea from './MarkdownTextarea';
 import MarkdownPreview from './MarkdownPreview';
+import StatusBar from './StatusBar';
+import TableOfContents from './TableOfContents';
+import SearchReplace from './SearchReplace';
+import MarkdownCheatsheet from './MarkdownCheatsheet';
+import WordGoalIndicator from './WordGoalIndicator';
+import ImageDrop from './ImageDrop';
+import AppGuide from './AppGuide';
 import { useEditorActions } from '@/hooks/useEditorActions';
 import DownloadDialog from './DownloadDialog';
+import { Search, BookOpen, Focus } from 'lucide-react';
+import { Button } from './ui/button';
 
 export interface MarkdownEditorProps {
   initialValue?: string;
@@ -18,7 +27,13 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   onChange,
 }) => {
   const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false);
+  const [isCheatsheetOpen, setIsCheatsheetOpen] = useState(false);
+  const [isAppGuideOpen, setIsAppGuideOpen] = useState(false);
   const [previewHtml, setPreviewHtml] = useState('');
+  const [showTOC, setShowTOC] = useState(false);
+  const [showSearchReplace, setShowSearchReplace] = useState(false);
+  const [isFocusMode, setIsFocusMode] = useState(false);
+  const [wordCount, setWordCount] = useState(0);
   
   const {
     markdownText,
@@ -29,6 +44,24 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     handlePreviewChange,
     handleToolbarAction
   } = useEditorActions(initialValue, onChange);
+
+  // Auto-save to localStorage
+  useEffect(() => {
+    const saveTimeout = setTimeout(() => {
+      localStorage.setItem('markdown-editor-content', markdownText);
+      localStorage.setItem('markdown-editor-last-saved', new Date().toISOString());
+    }, 1000);
+    
+    return () => clearTimeout(saveTimeout);
+  }, [markdownText]);
+
+  // Extract word count from the markdown text
+  useEffect(() => {
+    if (!markdownText) return;
+    const text = markdownText.trim();
+    const count = text ? text.split(/\s+/).filter(Boolean).length : 0;
+    setWordCount(count);
+  }, [markdownText]);
 
   // Global keyboard shortcuts
   useEffect(() => {
@@ -90,6 +123,33 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             e.preventDefault();
             handleToolbarAction('togglePreview');
             break;
+          case 'f':
+            if (e.shiftKey) {
+              e.preventDefault();
+              setIsFocusMode(!isFocusMode);
+            } else if (e.altKey) { 
+              e.preventDefault();
+              setShowSearchReplace(!showSearchReplace);
+            }
+            break;
+          case 't':
+            if (e.altKey) {
+              e.preventDefault();
+              setShowTOC(!showTOC);
+            }
+            break;
+          case 'h':
+            if (e.altKey) {
+              e.preventDefault();
+              setIsCheatsheetOpen(true);
+            }
+            break;
+          case 'g':
+            if (e.altKey) {
+              e.preventDefault();
+              setIsAppGuideOpen(true);
+            }
+            break;
           case '1':
             e.preventDefault();
             handleToolbarAction('heading1');
@@ -134,17 +194,61 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         e.preventDefault();
         handleToolbarAction('fullscreen');
       }
+
+      // Escape to exit focus mode or search/replace
+      if (e.key === 'Escape') {
+        if (isFocusMode) {
+          setIsFocusMode(false);
+        }
+        if (showSearchReplace) {
+          setShowSearchReplace(false);
+        }
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleToolbarAction, textareaRef]);
+  }, [
+    handleToolbarAction, 
+    textareaRef, 
+    isFocusMode, 
+    showSearchReplace, 
+    showTOC
+  ]);
 
   // Handler for when preview HTML changes
   const handlePreviewHtmlChange = (html: string) => {
     setPreviewHtml(html);
+  };
+
+  const toggleTOC = () => {
+    setShowTOC(!showTOC);
+  };
+
+  const toggleSearchReplace = () => {
+    setShowSearchReplace(!showSearchReplace);
+  };
+
+  const toggleFocusMode = () => {
+    setIsFocusMode(!isFocusMode);
+  };
+
+  const handleInsertImage = (imageMarkdown: string) => {
+    if (textareaRef.current) {
+      const cursorPos = textareaRef.current.selectionStart;
+      const textBefore = markdownText.substring(0, cursorPos);
+      const textAfter = markdownText.substring(cursorPos);
+      
+      // Insert the image markdown at the cursor position with newlines
+      const newText = `${textBefore}\n\n${imageMarkdown}\n\n${textAfter}`;
+      handleTextChange(newText);
+    } else {
+      // Fallback to appending to the end if we can't get cursor position
+      const newText = `${markdownText}\n\n${imageMarkdown}\n`;
+      handleTextChange(newText);
+    }
   };
 
   return (
@@ -159,26 +263,84 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         onAction={handleToolbarAction} 
         isPreviewMode={isPreviewMode} 
         isFullscreen={isFullscreen}
+        isFocusMode={isFocusMode}
+        onToggleTOC={toggleTOC}
+        onToggleFocus={toggleFocusMode}
+        onToggleSearchReplace={toggleSearchReplace}
+        onOpenCheatsheet={() => setIsCheatsheetOpen(true)}
         onOpenDownloadDialog={() => setIsDownloadDialogOpen(true)}
+        onOpenAppGuide={() => setIsAppGuideOpen(true)}
       />
       
       <div className="flex-1 flex overflow-hidden rounded-b-lg bg-editor-background">
-        <MarkdownTextarea
-          ref={textareaRef}
-          value={markdownText}
-          onChange={handleTextChange}
-          isPreviewMode={isPreviewMode}
-        />
+        {/* Main editor container */}
+        <div className={cn(
+          "flex-1 flex flex-col",
+          isFocusMode ? "max-w-2xl mx-auto" : "w-full"
+        )}>
+          {/* Editor and Preview */}
+          <div className="flex-1 flex overflow-hidden">
+            <MarkdownTextarea
+              ref={textareaRef}
+              value={markdownText}
+              onChange={handleTextChange}
+              isPreviewMode={isPreviewMode}
+              isFocusMode={isFocusMode}
+            />
 
-        <MarkdownPreview 
-          markdownText={markdownText}
-          isPreviewMode={isPreviewMode}
-          onContentChange={handlePreviewChange}
-          onHtmlChange={handlePreviewHtmlChange}
-        />
+            <MarkdownPreview 
+              markdownText={markdownText}
+              isPreviewMode={isPreviewMode}
+              isFocusMode={isFocusMode}
+              onContentChange={handlePreviewChange}
+              onHtmlChange={handlePreviewHtmlChange}
+            />
+          </div>
+          
+          {/* Search & Replace */}
+          {showSearchReplace && (
+            <div className="p-2">
+              <SearchReplace 
+                markdownText={markdownText} 
+                onUpdateText={handleTextChange}
+                onClose={() => setShowSearchReplace(false)}
+              />
+            </div>
+          )}
+        </div>
+        
+        {/* Table of Contents Sidebar */}
+        {showTOC && !isPreviewMode && (
+          <div className="w-64 border-l border-border/40 overflow-auto p-2">
+            <TableOfContents markdownText={markdownText} />
+          </div>
+        )}
       </div>
 
-      {/* Download dialog */}
+      <div className="border-t border-border/40 bg-editor-background">
+        <div className="flex justify-between items-center px-3 py-1">
+          <StatusBar markdownText={markdownText} />
+          <WordGoalIndicator wordCount={wordCount} className="ml-4" />
+        </div>
+      </div>
+
+      {/* Non-visual components */}
+      <ImageDrop 
+        isActive={!isPreviewMode}
+        onImageInsert={handleInsertImage}
+      />
+
+      {/* Dialogs */}
+      <MarkdownCheatsheet
+        open={isCheatsheetOpen}
+        onOpenChange={setIsCheatsheetOpen}
+      />
+
+      <AppGuide
+        open={isAppGuideOpen}
+        onOpenChange={setIsAppGuideOpen}
+      />
+
       <DownloadDialog 
         open={isDownloadDialogOpen} 
         onOpenChange={setIsDownloadDialogOpen} 

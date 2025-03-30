@@ -6,6 +6,7 @@ interface MarkdownPreviewProps {
   markdownText: string;
   className?: string;
   isPreviewMode: boolean;
+  isFocusMode?: boolean;
   onContentChange: (content: string) => void;
   onHtmlChange?: (html: string) => void;
 }
@@ -14,6 +15,7 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
   markdownText, 
   className,
   isPreviewMode,
+  isFocusMode = false,
   onContentChange,
   onHtmlChange
 }) => {
@@ -52,6 +54,7 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
       className={cn(
         'prose dark:prose-invert flex-1 p-6 overflow-auto bg-white/50 dark:bg-black/10 animate-fade-in',
         isPreviewMode ? 'block outline-none focus-ring' : 'hidden md:block border-l border-border/30',
+        isFocusMode && 'max-w-2xl mx-auto py-8 text-lg leading-relaxed',
         className
       )}
       onInput={handleInput}
